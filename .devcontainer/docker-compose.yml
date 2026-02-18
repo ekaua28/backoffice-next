@@ -1,0 +1,17 @@
+services:
+  dev:
+    image: node:22-alpine
+    working_dir: /workspaces/backoffice
+    command: sh -lc "corepack enable && sleep infinity"
+    volumes:
+      - type: bind
+        source: ..
+        target: /workspaces/backoffice
+      - pnpm_store:/pnpm-store
+    environment:
+      - PNPM_HOME=/pnpm
+      - PNPM_STORE_PATH=/pnpm-store
+    init: true
+
+volumes:
+  pnpm_store:

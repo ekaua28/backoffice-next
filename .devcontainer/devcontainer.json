@@ -1,0 +1,17 @@
+{
+  "name": "Backoffice (Dev)",
+  "dockerComposeFile": ["docker-compose.yml"],
+  "service": "dev",
+  "workspaceFolder": "/workspaces/backoffice",
+  "shutdownAction": "stopCompose",
+  "postCreateCommand": "corepack enable && pnpm -v && pnpm install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  }
+}
