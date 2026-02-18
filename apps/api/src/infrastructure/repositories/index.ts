@@ -1,2 +1,2 @@
-export { SessionsRepository } from "./sessions";
-export { UsersRepository } from "./users";
+export { SessionsRepository } from "./sessions.js";
+export { UsersRepository } from "./users.js";

@@ -1,4 +1,4 @@
-export { createSessionGuard } from "./sessionGuard";
-export { registerAuthRoutes } from "./auth.routes";
-export { registerSessionsRoutes } from "./sessions.routes";
-export { registerUsersRoutes } from "./users.routes";
+export { createSessionGuard } from "./sessionGuard.js";
+export { registerAuthRoutes } from "./auth.routes.js";
+export { registerSessionsRoutes } from "./sessions.routes.js";
+export { registerUsersRoutes } from "./users.routes.js";

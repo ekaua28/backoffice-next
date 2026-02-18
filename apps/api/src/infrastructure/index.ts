@@ -1,2 +1,2 @@
-export * from "./database";
-export * from "./repositories";
+export * from "./database/index.js";
+export * from "./repositories/index.js";

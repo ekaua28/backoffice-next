@@ -1,10 +1,10 @@
 import type { FastifyInstance } from "fastify";
-import { AppError, UsersService } from "../application";
+import { AppError, UsersService } from "../application/index.js";
 import {
   CreateUserSchema,
   PaginationSchema,
   UpdateUserSchema,
-} from "./validators";
+} from "./validators.js";
 
 export function registerUsersRoutes(
   app: FastifyInstance,

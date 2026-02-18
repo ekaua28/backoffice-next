@@ -1,10 +1,10 @@
 import { randomUUID } from "node:crypto";
 import argon2 from "argon2";
 import type { UserDto } from "../helpers";
-import { Credentials, User } from "../../domain";
+import { Credentials, User } from "../../domain/index.js";
 import type { UserStatus } from "../../domain";
-import { UsersRepository } from "../../infrastructure";
-import { Errors, toUserDto } from "../helpers";
+import { UsersRepository } from "../../infrastructure/index.js";
+import { Errors, toUserDto } from "../helpers/index.js";
 
 function nowIso() {
   return new Date().toISOString();

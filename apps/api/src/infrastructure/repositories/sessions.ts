@@ -1,6 +1,7 @@
 import type { Db } from "../database/db.js";
 import { q } from "../database/query.js";
-import { Session, type SessionProps } from "../../domain";
+import type { SessionProps } from "../../domain";
+import { Session } from "../../domain/index.js";
 
 type SessionRow = SessionProps;
 

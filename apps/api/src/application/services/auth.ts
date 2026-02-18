@@ -1,9 +1,9 @@
 import { randomUUID } from "node:crypto";
-import { User, Credentials } from "../../domain";
-import { UsersRepository } from "../../infrastructure";
-import { SessionsService } from "./sessions";
+import { User, Credentials } from "../../domain/index.js";
+import { UsersRepository } from "../../infrastructure/index.js";
+import { SessionsService } from "./sessions.js";
 import type { UserDto } from "../helpers";
-import { Errors, toUserDto } from "../helpers";
+import { Errors, toUserDto } from "../helpers/index.js";
 
 function nowIso() {
   return new Date().toISOString();

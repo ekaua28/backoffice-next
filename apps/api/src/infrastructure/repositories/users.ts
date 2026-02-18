@@ -1,6 +1,6 @@
-import type { Db } from "../database/db.js";
-import { q } from "../database/query.js";
-import { User } from "../../domain";
+import type { Db } from "../database";
+import { q } from "../database/index.js";
+import { User } from "../../domain/index.js";
 
 type UserDbRow = {
   id: string;

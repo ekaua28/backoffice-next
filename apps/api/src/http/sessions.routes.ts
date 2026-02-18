@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { AppError } from "../application/helpers/errors";
+import { AppError } from "../application/index.js";
 import type { SessionsService, UsersService } from "../application";
 
 export function registerSessionsRoutes(

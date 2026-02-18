@@ -1,4 +1,4 @@
-import { Credentials } from "../valueObjects";
+import { Credentials } from "../valueObjects/index.js";
 
 export type UserStatus = "active" | "inactive";
 export interface UserProps {

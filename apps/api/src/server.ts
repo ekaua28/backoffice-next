@@ -1,4 +1,4 @@
-import { DbSingleton } from "./infrastructure";
+import { DbSingleton } from "./infrastructure/database/db.js";
 import { createApp } from "./app.js";
 
 const PORT = Number(process.env.PORT ?? 4000);

@@ -1,1 +1,1 @@
-export { Credentials } from "./credentials";
+export { Credentials } from "./credentials.js";

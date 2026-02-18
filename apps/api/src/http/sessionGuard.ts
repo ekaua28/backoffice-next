@@ -1,6 +1,6 @@
 import type { FastifyRequest } from "fastify";
-import type { SessionsRepository } from "../infrastructure";
-import { Session } from "../domain";
+import type { SessionsRepository } from "../infrastructure/index.js";
+import { Session } from "../domain/index.js";
 
 export function createSessionGuard(sessionsRepo: SessionsRepository) {
   return async (req: FastifyRequest, reply: any) => {

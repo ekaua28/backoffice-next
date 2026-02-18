@@ -1,2 +1,2 @@
-export * from "./entities";
-export * from "./valueObjects"
+export * from "./entities/index.js";
+export * from "./valueObjects/index.js"

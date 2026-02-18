@@ -1,3 +1,3 @@
-export { SessionDto, UserDto } from "./dto";
-export { AppError, Errors } from "./errors";
-export { toSessionDto, toUserDto } from "./mappers";
+export { SessionDto, UserDto } from "./dto.js";
+export { AppError, Errors } from "./errors.js";
+export { toSessionDto, toUserDto } from "./mappers.js";

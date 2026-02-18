@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
-import { SignInSchema, SignUpSchema } from "./validators";
-import { AppError } from "../application";
+import { SignInSchema, SignUpSchema } from "./validators.js";
+import { AppError } from "../application/index.js";
 import type { AuthService } from "../application";
 
 /**
