@@ -1,12 +1,21 @@
 import Fastify from "fastify";
 import type { Db } from "./infrastructure";
-import { UsersRepository, SessionsRepository, migrate } from "./infrastructure/index.js";
-import { AuthService, SessionsService, UsersService } from "./application/index.js";
+import {
+  UsersRepository,
+  SessionsRepository,
+  migrate,
+} from "./infrastructure/index.js";
+import {
+  AuthService,
+  SessionsService,
+  UsersService,
+} from "./application/index.js";
 import {
   createSessionGuard,
   registerAuthRoutes,
   registerUsersRoutes,
   registerSessionsRoutes,
+  registerTestRoutes,
 } from "./http/index.js";
 
 /**
@@ -41,6 +50,10 @@ export function createApp(db: Db) {
   registerAuthRoutes(app, authService);
   registerUsersRoutes(app, usersService, guard);
   registerSessionsRoutes(app, sessionsService, usersService, guard);
+
+  if (process.env.ENABLE_TEST_ROUTES === "true") {
+    registerTestRoutes(app, db);
+  }
 
   return app;
 }
