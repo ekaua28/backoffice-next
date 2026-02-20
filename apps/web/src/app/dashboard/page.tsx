@@ -3,10 +3,31 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SessionGate } from "../../components/SessionGate";
-import type { UserDto } from "../../lib/api/types";
-import { api } from "../../lib/api";
+import { api, type UserDto } from "../../lib/api";
 import { clearSessionId, getSessionId } from "../../lib/auth/session.storage";
-import type { UserStatus } from "./status";
+import { useTheme } from "../../components/ThemeProvider";
+
+import {
+  Container,
+  Paper,
+  Typography,
+  Stack,
+  Button,
+  Alert,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Select,
+  MenuItem,
+  TextField,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 
 export default function AppPage() {
   return (
@@ -18,8 +39,11 @@ export default function AppPage() {
 
 function Dashboard() {
   const router = useRouter();
+  const { theme, toggle } = useTheme();
 
-  const [meName, setMeName] = useState<string>("");
+  const [meName, setMeName] = useState("");
+  const [currentUserId, setCurrentUserId] = useState("");
+
   const [page, setPage] = useState(1);
   const limit = 6;
 
@@ -28,6 +52,7 @@ function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
+  const [openCreate, setOpenCreate] = useState(false);
   const [cFirst, setCFirst] = useState("");
   const [cLast, setCLast] = useState("");
   const [cPass, setCPass] = useState("");
@@ -44,17 +69,14 @@ function Dashboard() {
     try {
       const me = await api.me();
       setMeName(me.user?.firstName ?? "");
+      setCurrentUserId(me.user?.id ?? "");
 
       const res = await api.usersList(p, limit);
       setUsers(res.items);
       setTotal(res.total);
       setPage(res.page);
-    } catch (e: unknown) {
-      if (e instanceof Error) {
-        setErr(e.message);
-      } else {
-        setErr("Failed to load");
-      }
+    } catch (e: any) {
+      setErr(e?.message ?? "Failed to load");
     } finally {
       setLoading(false);
     }
@@ -70,16 +92,13 @@ function Dashboard() {
     if (sid) {
       try {
         await api.logout(sid);
-      } catch {
-        /* ignore */
-      }
+      } catch {}
     }
     clearSessionId();
     router.replace("/auth/signin");
   }
 
-  async function createUser(e: React.FormEvent) {
-    e.preventDefault();
+  async function createUser() {
     setErr(null);
     try {
       await api.usersCreate({
@@ -88,34 +107,31 @@ function Dashboard() {
         password: cPass,
         status: cStatus,
       });
+      setOpenCreate(false);
       setCFirst("");
       setCLast("");
       setCPass("");
       setCStatus("active");
       await refresh(1);
-    } catch (e: unknown) {
-      if (e instanceof Error) {
-        setErr(e.message);
-      } else {
-        setErr("Create failed");
-      }
+    } catch (e: any) {
+      setErr(e?.message ?? "Create failed");
     }
   }
 
   async function saveUser(
-    u: UserDto,
-    patch: Partial<Pick<UserDto, "firstName" | "lastName" | "status">>,
+    id: string,
+    patch: {
+      firstName?: string;
+      lastName?: string;
+      status?: "active" | "inactive";
+    },
   ) {
     setErr(null);
     try {
-      await api.usersUpdate(u.id, patch);
+      await api.usersUpdate(id, patch);
       await refresh(page);
-    } catch (e: unknown) {
-      if (e instanceof Error) {
-        setErr(e.message);
-      } else {
-        setErr("Update failed");
-      }
+    } catch (e: any) {
+      setErr(e?.message ?? "Update failed");
     }
   }
 
@@ -126,177 +142,160 @@ function Dashboard() {
       await api.usersDelete(u.id);
       const nextPage = page > 1 && users.length === 1 ? page - 1 : page;
       await refresh(nextPage);
-    } catch (e: unknown) {
-      if (e instanceof Error) {
-        setErr(e.message);
-      } else {
-        setErr("Delete failed");
-      }
+    } catch (e: any) {
+      setErr(e?.message ?? "Delete failed");
     }
   }
 
   return (
-    <main style={{ maxWidth: 920, margin: "40px auto", padding: 16 }}>
-      <header
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: 12,
-        }}
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        spacing={2}
       >
         <div>
-          <h1 style={{ margin: 0 }}>User Management</h1>
-          <p style={{ margin: "6px 0 0", opacity: 0.75 }}>
+          <Typography variant="h4" fontWeight={800}>
+            User Management
+          </Typography>
+          <Typography variant="body2" sx={{ opacity: 0.8, mt: 0.5 }}>
             Hello {meName || "..."}
-          </p>
+          </Typography>
         </div>
-        <button onClick={logout}>Log Out</button>
-      </header>
 
-      {err && <p style={{ color: "crimson", marginTop: 12 }}>{err}</p>}
+        <Stack direction="row" spacing={1}>
+          <Button variant="outlined" onClick={toggle}>
+            Theme: {theme}
+          </Button>
+          <Button variant="contained" onClick={() => setOpenCreate(true)}>
+            Create user
+          </Button>
+          <Button color="inherit" variant="outlined" onClick={logout}>
+            Log out
+          </Button>
+        </Stack>
+      </Stack>
 
-      <section
-        style={{
-          marginTop: 18,
-          padding: 12,
-          border: "1px solid #ddd",
-          borderRadius: 10,
-        }}
-      >
-        <h2 style={{ marginTop: 0 }}>Create user</h2>
-        <form
-          onSubmit={createUser}
-          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}
+      {err && (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {err}
+        </Alert>
+      )}
+
+      <Paper sx={{ mt: 2, overflow: "hidden" }}>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ p: 2 }}
         >
-          <input
-            placeholder="First name"
-            value={cFirst}
-            onChange={(e) => setCFirst(e.target.value)}
-            required
-          />
-          <input
-            placeholder="Last name"
-            value={cLast}
-            onChange={(e) => setCLast(e.target.value)}
-            required
-          />
-          <input
-            style={{ gridColumn: "1 / span 2" }}
-            type="password"
-            placeholder="Password"
-            value={cPass}
-            onChange={(e) => setCPass(e.target.value)}
-            required
-          />
-          <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            Status
-            <select
-              value={cStatus}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                setCStatus(e.target.value as UserStatus);
-              }}
-            >
-              <option value="active">active</option>
-              <option value="inactive">inactive</option>
-            </select>
-          </label>
+          <Typography variant="h6" fontWeight={700}>
+            Users
+          </Typography>
 
-          <div
-            style={{
-              gridColumn: "1 / span 2",
-              display: "flex",
-              justifyContent: "flex-end",
-            }}
-          >
-            <button type="submit">Create</button>
-          </div>
-        </form>
-      </section>
-
-      <section style={{ marginTop: 18 }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <h2 style={{ margin: 0 }}>Users</h2>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <button
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Button
               disabled={page <= 1 || loading}
               onClick={() => refresh(page - 1)}
             >
               Prev
-            </button>
-            <span>
-              Page {page} / {totalPages}
-            </span>
-            <button
+            </Button>
+            <Chip label={`Page ${page} / ${totalPages}`} />
+            <Button
               disabled={page >= totalPages || loading}
               onClick={() => refresh(page + 1)}
             >
               Next
-            </button>
-          </div>
-        </div>
+            </Button>
+          </Stack>
+        </Stack>
 
-        <div
-          style={{
-            marginTop: 10,
-            border: "1px solid #ddd",
-            borderRadius: 10,
-            overflow: "hidden",
-          }}
-        >
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ background: "#f6f6f6" }}>
-                <th style={th}>Name</th>
-                <th style={th}>Status</th>
-                <th style={th}>Logins</th>
-                <th style={th}>Created</th>
-                <th style={th}>Updated</th>
-                <th style={th}></th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((u) => (
-                <UserRow
-                  key={u.id}
-                  u={u}
-                  onSave={(patch) => saveUser(u, patch)}
-                  onDelete={() => deleteUser(u)}
-                />
-              ))}
-              {!users.length && (
-                <tr>
-                  <td style={{ padding: 12 }} colSpan={6}>
-                    {loading ? "Loading..." : "No users"}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </main>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Logins</TableCell>
+              <TableCell>Created</TableCell>
+              <TableCell>Updated</TableCell>
+              <TableCell align="right" />
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {users.map((u) => (
+              <UserRow
+                key={u.id}
+                u={u}
+                isCurrent={u.id === currentUserId}
+                onSave={(patch) => saveUser(u.id, patch)}
+                onDelete={() => deleteUser(u)}
+              />
+            ))}
+            {!users.length && (
+              <TableRow>
+                <TableCell colSpan={6}>
+                  {loading ? "Loading..." : "No users"}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </Paper>
+
+      <Dialog
+        open={openCreate}
+        onClose={() => setOpenCreate(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Create user</DialogTitle>
+        <DialogContent sx={{ pt: 1 }}>
+          <Stack spacing={2} sx={{ mt: 1 }}>
+            <TextField
+              label="First name"
+              value={cFirst}
+              onChange={(e) => setCFirst(e.target.value)}
+            />
+            <TextField
+              label="Last name"
+              value={cLast}
+              onChange={(e) => setCLast(e.target.value)}
+            />
+            <TextField
+              label="Password"
+              type="password"
+              value={cPass}
+              onChange={(e) => setCPass(e.target.value)}
+            />
+            <Select
+              value={cStatus}
+              onChange={(e) => setCStatus(e.target.value as any)}
+            >
+              <MenuItem value="active">active</MenuItem>
+              <MenuItem value="inactive">inactive</MenuItem>
+            </Select>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenCreate(false)}>Cancel</Button>
+          <Button variant="contained" onClick={createUser}>
+            Create
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Container>
   );
 }
 
-const th: React.CSSProperties = {
-  textAlign: "left",
-  padding: 10,
-  borderBottom: "1px solid #ddd",
-};
-
 function UserRow({
   u,
+  isCurrent,
   onSave,
   onDelete,
 }: {
   u: UserDto;
+  isCurrent: boolean;
   onSave: (patch: {
     firstName?: string;
     lastName?: string;
@@ -318,53 +317,60 @@ function UserRow({
     firstName !== u.firstName || lastName !== u.lastName || status !== u.status;
 
   return (
-    <tr>
-      <td style={td}>
-        <div style={{ display: "flex", gap: 8 }}>
-          <input
+    <TableRow hover>
+      <TableCell>
+        <Stack direction="row" spacing={1} alignItems="center">
+          <TextField
+            size="small"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            style={inp}
           />
-          <input
+          <TextField
+            size="small"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            style={inp}
           />
-        </div>
-      </td>
-      <td style={td}>
-        <select
+          {isCurrent && <Chip size="small" label="you" />}
+        </Stack>
+      </TableCell>
+
+      <TableCell>
+        <Select
+          size="small"
           value={status}
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-              setStatus(e.target.value as UserStatus);
-          }}
+          onChange={(e) => setStatus(e.target.value as any)}
+          disabled={isCurrent}
         >
-          <option value="active">active</option>
-          <option value="inactive">inactive</option>
-        </select>
-      </td>
-      <td style={td}>{u.loginsCounter}</td>
-      <td style={td}>{new Date(u.creationTime).toLocaleString()}</td>
-      <td style={td}>{new Date(u.lastUpdateTime).toLocaleString()}</td>
-      <td style={td}>
-        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-          <button
-            disabled={!dirty}
+          <MenuItem value="active">active</MenuItem>
+          <MenuItem value="inactive">inactive</MenuItem>
+        </Select>
+      </TableCell>
+
+      <TableCell>{u.loginsCounter}</TableCell>
+      <TableCell>{new Date(u.creationTime).toLocaleString()}</TableCell>
+      <TableCell>{new Date(u.lastUpdateTime).toLocaleString()}</TableCell>
+
+      <TableCell align="right">
+        <Stack direction="row" spacing={1} justifyContent="flex-end">
+          <Button
+            size="small"
+            variant="outlined"
+            disabled={!dirty || isCurrent}
             onClick={() => onSave({ firstName, lastName, status })}
           >
             Save
-          </button>
-          <button onClick={onDelete}>Delete</button>
-        </div>
-      </td>
-    </tr>
+          </Button>
+          <Button
+            size="small"
+            color="error"
+            variant="outlined"
+            disabled={isCurrent}
+            onClick={onDelete}
+          >
+            Delete
+          </Button>
+        </Stack>
+      </TableCell>
+    </TableRow>
   );
 }
-
-const td: React.CSSProperties = {
-  padding: 10,
-  borderBottom: "1px solid #eee",
-  verticalAlign: "top",
-};
-const inp: React.CSSProperties = { width: "100%", minWidth: 110 };

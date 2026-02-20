@@ -5,6 +5,15 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { api } from "../../../lib/api";
 import { setSessionId } from "../../../lib/auth/session.storage";
+import {
+  Container,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Alert,
+  Stack,
+} from "@mui/material";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -29,63 +38,59 @@ export default function SignUpPage() {
       const res = await api.signUp({ firstName, lastName, password: p1 });
       setSessionId(res.id);
       router.replace("/dashboard");
-    } catch (e: unknown) {
-      if (e instanceof Error) {
-        setErr(e.message);
-      } else {
-        setErr("Failed");
-      }
+    } catch (e: any) {
+      setErr(e?.message ?? "Failed");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <main style={{ maxWidth: 420, margin: "40px auto", padding: 16 }}>
-      <h1>Sign up</h1>
+    <Container maxWidth="sm" sx={{ py: 6 }}>
+      <Paper sx={{ p: 3 }}>
+        <Typography variant="h4" fontWeight={700}>
+          Sign up
+        </Typography>
 
-      <form
-        onSubmit={onSubmit}
-        style={{ display: "grid", gap: 10, marginTop: 12 }}
-      >
-        <input
-          placeholder="First name"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-          required
-        />
-        <input
-          placeholder="Last name"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-          required
-        />
+        <Stack component="form" onSubmit={onSubmit} spacing={2} sx={{ mt: 2 }}>
+          <TextField
+            label="First name"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            required
+          />
+          <TextField
+            label="Last name"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            required
+          />
+          <TextField
+            label="Password"
+            type="password"
+            value={p1}
+            onChange={(e) => setP1(e.target.value)}
+            required
+          />
+          <TextField
+            label="Repeat password"
+            type="password"
+            value={p2}
+            onChange={(e) => setP2(e.target.value)}
+            required
+          />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={p1}
-          onChange={(e) => setP1(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Repeat password"
-          value={p2}
-          onChange={(e) => setP2(e.target.value)}
-          required
-        />
+          {err && <Alert severity="error">{err}</Alert>}
 
-        {err && <p style={{ color: "crimson" }}>{err}</p>}
+          <Button variant="contained" type="submit" disabled={loading}>
+            {loading ? "Signing up..." : "Create account"}
+          </Button>
 
-        <button disabled={loading} type="submit">
-          {loading ? "Signing up..." : "Create account"}
-        </button>
-      </form>
-
-      <p style={{ marginTop: 12 }}>
-        Already have an account? <Link href="/auth/signin">Sign in</Link>
-      </p>
-    </main>
+          <Typography variant="body2">
+            Already have an account? <Link href="/auth/signin">Sign in</Link>
+          </Typography>
+        </Stack>
+      </Paper>
+    </Container>
   );
 }

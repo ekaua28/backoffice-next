@@ -5,6 +5,15 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { api } from "../../../lib/api";
 import { setSessionId } from "../../../lib/auth/session.storage";
+import {
+  Container,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Alert,
+  Stack,
+} from "@mui/material";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -22,55 +31,52 @@ export default function SignInPage() {
       const res = await api.signIn({ firstName, lastName, password });
       setSessionId(res.id);
       router.replace("/dashboard");
-    } catch (e: unknown) {
-      if (e instanceof Error) {
-        setErr(e.message);
-      } else {
-        setErr("Failed");
-      }
+    } catch (e: any) {
+      setErr(e?.message ?? "Failed");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <main style={{ maxWidth: 420, margin: "40px auto", padding: 16 }}>
-      <h1>Sign in</h1>
+    <Container maxWidth="sm" sx={{ py: 6 }}>
+      <Paper sx={{ p: 3 }}>
+        <Typography variant="h4" fontWeight={700}>
+          Sign in
+        </Typography>
 
-      <form
-        onSubmit={onSubmit}
-        style={{ display: "grid", gap: 10, marginTop: 12 }}
-      >
-        <input
-          placeholder="First name"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-          required
-        />
-        <input
-          placeholder="Last name"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+        <Stack component="form" onSubmit={onSubmit} spacing={2} sx={{ mt: 2 }}>
+          <TextField
+            label="First name"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            required
+          />
+          <TextField
+            label="Last name"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            required
+          />
+          <TextField
+            label="Password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
 
-        {err && <p style={{ color: "crimson" }}>{err}</p>}
+          {err && <Alert severity="error">{err}</Alert>}
 
-        <button disabled={loading} type="submit">
-          {loading ? "Signing in..." : "Sign in"}
-        </button>
-      </form>
+          <Button variant="contained" type="submit" disabled={loading}>
+            {loading ? "Signing in..." : "Sign in"}
+          </Button>
 
-      <p style={{ marginTop: 12 }}>
-        No account? <Link href="/auth/signup">Sign up</Link>
-      </p>
-    </main>
+          <Typography variant="body2">
+            No account? <Link href="/auth/signup">Sign up</Link>
+          </Typography>
+        </Stack>
+      </Paper>
+    </Container>
   );
 }
