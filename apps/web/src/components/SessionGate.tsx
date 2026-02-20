@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "../lib/api";
-import { clearSessionId, getSessionId } from "../lib/session";
+import { clearSessionId, getSessionId } from "../lib/auth/session.storage";
 
 export function SessionGate({ children }: { children: React.ReactNode }) {
   const router = useRouter();

@@ -21,7 +21,9 @@ class InactiveUserCannotCreateSessionError extends Error {
 
 class InactiveUserCannotRenameError extends Error {
   constructor() {
-    super("First and Last Name properties cannot be updated if the user is inactive.");
+    super(
+      "First and Last Name properties cannot be updated if the user is inactive.",
+    );
     this.name = "InactiveUserCannotRenameError";
   }
 }
@@ -32,7 +34,8 @@ class InactiveUserCannotRenameError extends Error {
 export class User {
   private constructor(private props: UserProps) {}
 
-  static InactiveUserCannotCreateSessionError = InactiveUserCannotCreateSessionError;
+  static InactiveUserCannotCreateSessionError =
+    InactiveUserCannotCreateSessionError;
   static InactiveUserCannotRenameError = InactiveUserCannotRenameError;
 
   static create(params: {
@@ -51,11 +54,13 @@ export class User {
       loginsCounter: 0,
       createdAt: params.now,
       updatedAt: params.now,
-      credentials: params.credentials
+      credentials: params.credentials,
     });
   }
 
-  static fromPersistence(row: Omit<UserProps, "credentials"> & { passwordHash: string }): User {
+  static fromPersistence(
+    row: Omit<UserProps, "credentials"> & { passwordHash: string },
+  ): User {
     return new User({
       id: row.id,
       firstName: row.firstName,
@@ -64,21 +69,44 @@ export class User {
       loginsCounter: row.loginsCounter,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
-      credentials: Credentials.fromHash(row.passwordHash)
+      credentials: Credentials.fromHash(row.passwordHash),
     });
   }
 
-  get id() { return this.props.id; }
-  get firstName() { return this.props.firstName; }
-  get lastName() { return this.props.lastName; }
-  get status() { return this.props.status; }
-  get loginsCounter() { return this.props.loginsCounter; }
-  get createdAt() { return this.props.createdAt; }
-  get updatedAt() { return this.props.updatedAt; }
-  get credentials() { return this.props.credentials; }
+  get id() {
+    return this.props.id;
+  }
+  get firstName() {
+    return this.props.firstName;
+  }
+  get lastName() {
+    return this.props.lastName;
+  }
+  get status() {
+    return this.props.status;
+  }
+  get loginsCounter() {
+    return this.props.loginsCounter;
+  }
+  get createdAt() {
+    return this.props.createdAt;
+  }
+  get updatedAt() {
+    return this.props.updatedAt;
+  }
+  get credentials() {
+    return this.props.credentials;
+  }
 
-  update(patch: { firstName?: string; lastName?: string; status?: UserStatus }, now: string) {
-    if (this.props.status === "inactive" && (patch.firstName !== undefined || patch.lastName !== undefined)) {
+  update(
+    patch: { firstName?: string; lastName?: string; status?: UserStatus },
+    now: string,
+  ) {
+    if (
+      this.props.status === "inactive" &&
+      (!patch.status || patch.status !== "active") &&
+      (patch.firstName !== undefined || patch.lastName !== undefined)
+    ) {
       throw new InactiveUserCannotRenameError();
     }
     if (patch.firstName !== undefined) this.props.firstName = patch.firstName;
@@ -88,7 +116,8 @@ export class User {
   }
 
   assertCanCreateSession() {
-    if (this.props.status !== "active") throw new InactiveUserCannotCreateSessionError();
+    if (this.props.status !== "active")
+      throw new InactiveUserCannotCreateSessionError();
   }
 
   bumpLogin(now: string) {
@@ -97,8 +126,14 @@ export class User {
   }
 
   toPersistence(): {
-    id: string; firstName: string; lastName: string; status: UserStatus;
-    loginsCounter: number; passwordHash: string; createdAt: string; updatedAt: string;
+    id: string;
+    firstName: string;
+    lastName: string;
+    status: UserStatus;
+    loginsCounter: number;
+    passwordHash: string;
+    createdAt: string;
+    updatedAt: string;
   } {
     return {
       id: this.props.id,
@@ -108,7 +143,7 @@ export class User {
       loginsCounter: this.props.loginsCounter,
       passwordHash: this.props.credentials.toHash(),
       createdAt: this.props.createdAt,
-      updatedAt: this.props.updatedAt
+      updatedAt: this.props.updatedAt,
     };
   }
 }

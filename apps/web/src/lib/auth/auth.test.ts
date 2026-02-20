@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { setSessionId, getSessionId, clearSessionId, SESSION_KEY } from "./session";
+import { setSessionId, getSessionId, clearSessionId, SESSION_KEY } from "./session.storage";
 
 describe("session storage", () => {
   beforeEach(() => {

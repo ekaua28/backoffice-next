@@ -12,7 +12,7 @@ describe("Sessions (domain)", () => {
       url: "/auth/signup",
       payload: { firstName: "A", lastName: "B", password: "123456" }
     });
-    const { id: sid } = su.json() as any;
+    const { id: sid } = su.json();
 
     const term1 = await app.inject({
       method: "PATCH",
