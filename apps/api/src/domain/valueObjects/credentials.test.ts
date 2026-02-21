@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Credentials } from "../src/domain/valueObjects/credentials";
+import { Credentials } from "./credentials.js";
 
 describe("Credentials VO", () => {
   it("hash+verify works", async () => {
