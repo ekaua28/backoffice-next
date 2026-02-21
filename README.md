@@ -29,8 +29,8 @@ This project implements a complete user and session management system with:
 ## Architecture
 
 See:
-- apps/api/README.md
-- apps/web/README.md
+- [apps/api/README.md](apps/api/README.md)
+- [apps/web/README.md](apps/web/README.md)
 
 ---
 
