@@ -75,8 +75,12 @@ function Dashboard() {
       setUsers(res.items);
       setTotal(res.total);
       setPage(res.page);
-    } catch (e: any) {
-      setErr(e?.message ?? "Failed to load");
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        setErr(e.message);
+      } else {
+        setErr("Failed to load");
+      }
     } finally {
       setLoading(false);
     }
@@ -113,8 +117,12 @@ function Dashboard() {
       setCPass("");
       setCStatus("active");
       await refresh(1);
-    } catch (e: any) {
-      setErr(e?.message ?? "Create failed");
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        setErr(e.message);
+      } else {
+        setErr("Create failed");
+      }
     }
   }
 
@@ -130,8 +138,12 @@ function Dashboard() {
     try {
       await api.usersUpdate(id, patch);
       await refresh(page);
-    } catch (e: any) {
-      setErr(e?.message ?? "Update failed");
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        setErr(e.message);
+      } else {
+        setErr("Update failed");
+      }
     }
   }
 
@@ -142,8 +154,12 @@ function Dashboard() {
       await api.usersDelete(u.id);
       const nextPage = page > 1 && users.length === 1 ? page - 1 : page;
       await refresh(nextPage);
-    } catch (e: any) {
-      setErr(e?.message ?? "Delete failed");
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        setErr(e.message);
+      } else {
+        setErr("Delete failed");
+      }
     }
   }
 
@@ -374,3 +390,5 @@ function UserRow({
     </TableRow>
   );
 }
+
+export { Dashboard };

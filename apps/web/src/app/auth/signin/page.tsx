@@ -31,8 +31,12 @@ export default function SignInPage() {
       const res = await api.signIn({ firstName, lastName, password });
       setSessionId(res.id);
       router.replace("/dashboard");
-    } catch (e: any) {
-      setErr(e?.message ?? "Failed");
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        setErr(e.message);
+      } else {
+        setErr("Failed");
+      }
     } finally {
       setLoading(false);
     }

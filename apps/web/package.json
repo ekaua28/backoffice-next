@@ -21,10 +21,13 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.50.0",
-    "typescript": "^5.6.3",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^22.10.7",
     "@types/react": "^19.0.3",
     "jsdom": "27.0.0",
+    "typescript": "^5.6.3",
     "vitest": "^2.1.8"
   }
 }

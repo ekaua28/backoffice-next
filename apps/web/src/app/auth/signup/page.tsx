@@ -33,13 +33,22 @@ export default function SignUpPage() {
       return;
     }
 
+    if (p1.length < 6) {
+      setErr("Passwords must contain at least 6 character");
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await api.signUp({ firstName, lastName, password: p1 });
       setSessionId(res.id);
       router.replace("/dashboard");
-    } catch (e: any) {
-      setErr(e?.message ?? "Failed");
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        setErr(e.message);
+      } else {
+        setErr("Failed");
+      }
     } finally {
       setLoading(false);
     }

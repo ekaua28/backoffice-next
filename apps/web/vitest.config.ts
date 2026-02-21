@@ -2,6 +2,9 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    environment: "jsdom"
-  }
+    environment: "jsdom",
+    setupFiles: ["./vitest.setup.ts"],
+    exclude: ["tests/e2e/**", "node_modules", "dist"],
+    globals: true,
+  },
 });
