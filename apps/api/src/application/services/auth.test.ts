@@ -131,7 +131,7 @@ describe("AuthService", () => {
       id: "u1",
       credentials: { verify: vi.fn(async () => true) },
       assertCanCreateSession: vi.fn(() => {
-        throw new User.InactiveUserCannotCreateSessionError("Inactive users cannot create sessions");
+        throw new User.InactiveUserCannotCreateSessionError();
       }),
       bumpLogin: vi.fn(),
     };
